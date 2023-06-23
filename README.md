@@ -21,7 +21,6 @@
 <li>댓글 및 좋아요 기능</li>
 <li>이미지 및 동영상 탐색</li>
 <li>프로필 관리</li>
-<li>친구 및 팔로워 추가</li>
 </ul>
 </section>
 <section>
