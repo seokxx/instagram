@@ -13,6 +13,6 @@ var theme = ThemeData(
     actionsIconTheme: IconThemeData(color:Colors.white),
   ),
   textTheme: TextTheme(
-    bodyText2: TextStyle(color: Colors.red),
+    bodyText2: TextStyle(color: Colors.black),
   ),
 );
