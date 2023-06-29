@@ -9,12 +9,19 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MaterialApp(
-    theme: style.theme,
-    home: MyApp()
-    )
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (c)=>Store1()),
+      ChangeNotifierProvider(create: (c)=>Store2()),
+    ],
+    child: MaterialApp(
+      theme: style.theme,
+      home: MyApp()
+      ),
+  )
   );
 }
 
@@ -245,14 +252,66 @@ class Upload extends StatelessWidget {
   }
 }
 
-class Profile extends StatelessWidget {
+class Store1 extends ChangeNotifier {
+  var follower = 0;
+  var checkFollower = false;
+  var profileImage = [];
+
+  getData() async{
+    var result = await http.get(Uri.parse('https://codingapple1.github.io/app/profile.json'));
+    var result2 = jsonDecode(result.body);
+    profileImage = result2;
+    print(profileImage);
+    notifyListeners();
+  }
+
+  addFollower(){
+    if(checkFollower == false) {
+      follower++;
+      checkFollower = true;
+    }
+    else{
+      follower--;
+      checkFollower = false;
+    }
+    notifyListeners();
+  }
+}
+
+class Store2 extends ChangeNotifier{
+  var name = 'john kim';
+}
+
+class Profile extends StatefulWidget {
   const Profile({super.key});
+
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Text('프로필페이지'),
+      appBar: AppBar(title: Text(context.watch<Store2>().name),),
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.grey,
+          ),
+          Text('팔로워 ${context.watch<Store1>().follower}명'),
+          ElevatedButton(onPressed: (){
+            context.read<Store1>().addFollower();
+          }, child: Text('팔로우')),
+          ElevatedButton(onPressed: (){
+            context.read<Store1>().getData();
+          }, child: Text('사진 가져오기')),
+        ],
+      ),
     );
   }
 }
