@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'notification.dart';
 import 'style.dart' as style;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -86,13 +87,18 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    initNotification(context);
     getData();
     saveData();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+      floatingActionButton: FloatingActionButton(child: Text('+'), onPressed: (){
+        showNotification2();
+      },),
       appBar: AppBar(
           title: Text('Instagram'),
           actions:[
@@ -209,13 +215,23 @@ class _HomeState extends State<Home> {
                 ),
                 Text('좋아요: ${widget.data[i]['likes']}'),
                 Text(widget.data[i]['date']),
-                Text(widget.data[i]['content']),
+                Text(widget.data[i]['content'], style: TextStyle(
+                    fontSize: fontSize1(context)
+                )),
               ],
             );
           });
     } else {
       return Text('loading...');
     }
+  }
+}
+
+fontSize1(context){
+  if(MediaQuery.of(context).size.width > 600){
+    return 30;
+  } else {
+    return 16;
   }
 }
 
@@ -296,23 +312,44 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(context.watch<Store2>().name),),
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.grey,
+      body: CustomScrollView(
+        slivers:[
+          SliverToBoxAdapter(
+            child: ProfileHeader(),
           ),
-          Text('팔로워 ${context.watch<Store1>().follower}명'),
-          ElevatedButton(onPressed: (){
-            context.read<Store1>().addFollower();
-          }, child: Text('팔로우')),
-          ElevatedButton(onPressed: (){
-            context.read<Store1>().getData();
-          }, child: Text('사진 가져오기')),
+          SliverGrid(
+              delegate: SliverChildBuilderDelegate(
+                  (context,i) => Image.network(context.watch<Store1>().profileImage[i]),
+                  childCount: context.watch<Store1>().profileImage.length,
+              ),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3)
+          )
         ],
-      ),
+      )
     );
   }
 }
 
+class ProfileHeader extends StatelessWidget {
+  const ProfileHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        CircleAvatar(
+          radius: 30,
+          backgroundColor: Colors.grey,
+        ),
+        Text('팔로워 ${context.watch<Store1>().follower}명'),
+        ElevatedButton(onPressed: (){
+          context.read<Store1>().addFollower();
+        }, child: Text('팔로우')),
+        ElevatedButton(onPressed: (){
+          context.read<Store1>().getData();
+        }, child: Text('사진 가져오기')),
+      ],
+    );
+  }
+}
