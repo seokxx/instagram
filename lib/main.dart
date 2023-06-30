@@ -94,9 +94,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(child: Text('+'), onPressed: (){
-        showNotification();
+        showNotification2();
       },),
       appBar: AppBar(
           title: Text('Instagram'),
@@ -214,13 +215,23 @@ class _HomeState extends State<Home> {
                 ),
                 Text('좋아요: ${widget.data[i]['likes']}'),
                 Text(widget.data[i]['date']),
-                Text(widget.data[i]['content']),
+                Text(widget.data[i]['content'], style: TextStyle(
+                    fontSize: fontSize1(context)
+                )),
               ],
             );
           });
     } else {
       return Text('loading...');
     }
+  }
+}
+
+fontSize1(context){
+  if(MediaQuery.of(context).size.width > 600){
+    return 30;
+  } else {
+    return 16;
   }
 }
 
